@@ -1,0 +1,15 @@
+<!-- app/templates/app/comment_form.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add/Edit Comment</title>
+</head>
+<body>
+    <h2>Add/Edit Comment</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Comment</button>
+    </form>
+</body>
+</html>

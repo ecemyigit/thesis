@@ -117,6 +117,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+LOGIN_URL = 'login'  # Assuming you have a URL pattern named 'login'
+LOGIN_REDIRECT_URL = 'app:dashboard'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

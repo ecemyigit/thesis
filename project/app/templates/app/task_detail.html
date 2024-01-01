@@ -1,0 +1,17 @@
+<!-- app/templates/app/task_detail.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Detail</title>
+</head>
+<body>
+    <h2>{{ task.title }}</h2>
+    <p>{{ task.description }}</p>
+    <!-- Add more task details as needed -->
+    <p>Status: {{ task.status }}</p>
+    <p>Due Date: {{ task.due_date }}</p>
+    <!-- Other fields like priority, assignee, etc. -->
+    <a href="{% url 'task_update' task.id %}">Edit Task</a>
+    <a href="{% url 'task_delete' task.id %}">Delete Task</a>
+</body>
+</html>

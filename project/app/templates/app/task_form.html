@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Create/Edit Task{% endblock %}</title>
+</head>
+<body>
+    <h2>{% block header %}Create/Edit Task{% endblock %}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Task</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!-- app/templates/app/attachment_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attachments for Task</title>
+</head>
+<body>
+    <h2>Attachments</h2>
+    <ul>
+        {% for attachment in attachments %}
+            <li>
+                {{ attachment.file_name }}
+                <!-- Add more attachment details or actions as needed -->
+            </li>
+        {% empty %}
+            <li>No attachments yet.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'attachment_create' task_id %}">Add Attachment</a>
+</body>
+</html>

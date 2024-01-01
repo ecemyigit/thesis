@@ -1,0 +1,17 @@
+<!-- app/templates/app/label_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Label List</title>
+</head>
+<body>
+    <h2>Labels</h2>
+    <ul>
+        {% for label in labels %}
+            <li>{{ label.name }}</li>
+            <!-- Add more label details or actions as needed -->
+        {% endfor %}
+    </ul>
+    <a href="{% url 'label_create' %}">Create New Label</a>
+</body>
+</html>

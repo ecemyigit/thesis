@@ -1,0 +1,19 @@
+<!-- app/templates/app/comment_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comments for Task</title>
+</head>
+<body>
+    <h2>Comments</h2>
+    <ul>
+        {% for comment in comments %}
+            <li>{{ comment.content }} - by {{ comment.author.username }}</li>
+            <!-- Add more comment details or actions as needed -->
+        {% empty %}
+            <li>No comments yet.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'comment_create' task_id %}">Add Comment</a>
+</body>
+</html>

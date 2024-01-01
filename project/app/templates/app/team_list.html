@@ -1,0 +1,19 @@
+<!-- app/templates/app/team_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Team List</title>
+</head>
+<body>
+    <h2>Teams</h2>
+    <ul>
+        {% for team in teams %}
+            <li>
+                <a href="{% url 'team_detail' team.id %}">{{ team.name }}</a>
+                <!-- Add more details or links as needed -->
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'team_create' %}">Create New Team</a>
+</body>
+</html>

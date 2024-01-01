@@ -10,7 +10,8 @@ urlpatterns = [
     path('register/', views.register, name='register'),  # URL for user registration
     path('login/', auth_views.LoginView.as_view(template_name='app/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='app/logout.html'), name='logout'),
-    # Team URLs
+    path('dashboard/', views.dashboard, name='dashboard'),
+
     # Team URLs
     path('teams/', views.team_list, name='team-list'),
     path('teams/create/', views.team_create, name='team-create'),
@@ -37,10 +38,5 @@ urlpatterns = [
     path('attachments/<int:attachment_id>/update/', views.attachment_update, name='attachment-update'),
     path('attachments/<int:attachment_id>/delete/', views.attachment_delete, name='attachment-delete'),
 
-    # Label URLs
-    path('labels/', views.label_list, name='label-list'),
-    path('labels/create/', views.label_create, name='label-create'),
-    path('labels/<int:label_id>/', views.label_detail, name='label-detail'),
-    path('labels/<int:label_id>/update/', views.label_update, name='label-update'),
-    path('labels/<int:label_id>/delete/', views.label_delete, name='label-delete'),
+
 ]

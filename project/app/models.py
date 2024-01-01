@@ -28,6 +28,7 @@ class Task(models.Model):
         default=TaskStatus.TODO,
     )
     team = models.ForeignKey(Team, related_name='tasks', on_delete=models.CASCADE)
+    creator = models.ForeignKey(User, related_name='created_tasks', on_delete=models.SET_NULL, null=True, blank=True)
     assignee = models.ForeignKey(User, related_name='assigned_tasks', on_delete=models.SET_NULL, null=True, blank=True)
     watchers = models.ManyToManyField(User, related_name='watched_tasks', blank=True)
     is_deleted = models.BooleanField(default=False)

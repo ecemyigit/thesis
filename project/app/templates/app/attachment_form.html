@@ -1,0 +1,15 @@
+<!-- app/templates/app/attachment_form.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add/Edit Attachment</title>
+</head>
+<body>
+    <h2>Add/Edit Attachment</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Attachment</button>
+    </form>
+</body>
+</html>
