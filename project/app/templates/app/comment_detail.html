@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comment Detail</title>
+</head>
+<body>
+    <h2>Comment Detail</h2>
+
+    <p><strong>Comment:</strong> {{ comment.content }}</p>
+    <p><strong>Author:</strong> {{ comment.author.username }}</p>
+    <p><strong>Date:</strong> {{ comment.date }}</p>
+
+    <a href="{% url 'app:comment_update' comment.id %}">Edit Comment</a>
+    <a href="{% url 'app:comment_delete' comment.id %}">Delete Comment</a>
+    <a href="{% url 'app:task_detail' comment.task.id %}">Back to Task Detail</a>
+</body>
+</html>

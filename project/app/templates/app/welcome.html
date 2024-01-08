@@ -1,0 +1,19 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome to Task Manager</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>Welcome to Task Manager</h1>
+        <p>Your one-stop solution to manage tasks efficiently!</p>
+        <div class="welcome-actions">
+            <a href="{% url 'app:login' %}" class="btn btn-primary">Login</a>
+            <a href="{% url 'app:register' %}" class="btn btn-secondary">Register</a>
+        </div>
+    </div>
+</body>
+</html>

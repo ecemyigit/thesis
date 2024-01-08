@@ -3,7 +3,29 @@ from django.shortcuts import render, redirect
 from .forms import UserRegisterForm, TaskForm, Task, TeamForm, CommentForm, AttachmentForm, LabelForm
 from .models import Team, Comment, Attachment, Label
 from django.contrib.auth.decorators import login_required
+from django.contrib import auth
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
+from django.contrib.auth import logout
 
+'''def custom_logout(request):
+    if request.user.is_staff or request.user.is_superuser:
+        logout(request)
+        return redirect('admin-login')  # Redirect to the admin login page
+    else:
+        logout(request)
+        return redirect('login')  # Redirect to the regular user login page'''
+from django.shortcuts import redirect
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def welcome(request):
+    return render(request, 'app/welcome.html')
+
+def logout(request):
+    """Logs out the user."""
+    auth.logout(request)
+    return redirect('app:login')
 
 def register(request):
     if request.method == 'POST':
@@ -30,22 +52,22 @@ def team_create(request):
         form = TeamForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('team_list')
+            return redirect('app:team_list')
     else:
         form = TeamForm()
     return render(request, 'app/team_form.html', {'form': form})
 
 def team_detail(request, team_id):
-    team = Team.objects.get(id=team_id)
-    return render(request, 'app/team_detail.html', {'team': team})
-
+    team = get_object_or_404(Team, pk=team_id)
+    members = team.members.all()
+    return render(request, 'app/team_detail.html', {'team': team, 'members': members})
 def team_update(request, team_id):
     team = Team.objects.get(id=team_id)
     if request.method == 'POST':
         form = TeamForm(request.POST, instance=team)
         if form.is_valid():
             form.save()
-            return redirect('team_detail', team_id=team.id)
+            return redirect('app:team_detail', team_id=team.id)
     else:
         form = TeamForm(instance=team)
     return render(request, 'app/team_form.html', {'form': form})
@@ -53,28 +75,35 @@ def team_update(request, team_id):
 def team_delete(request, team_id):
     team = Team.objects.get(id=team_id)
     team.delete()
-    return redirect('team_list')
+    return redirect('app:team_list')
 def task_list(request):
     tasks = Task.objects.all()
     return render(request, 'app/task_list.html', {'tasks': tasks})
 
-@login_required  # Ensures that only logged-in users can create tasks
+@login_required
 def task_create(request):
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
             new_task = form.save(commit=False)
-            new_task.creator = request.user  # Set the creator to the current user
+            new_task.creator = request.user
             new_task.save()
-            return redirect('task_list')  # Redirect to the task list view
+            return redirect('app:task_list')
     else:
         form = TaskForm()
     return render(request, 'app/task_form.html', {'form': form})
 
 
+# views.py
 def task_detail(request, task_id):
-    task = Task.objects.get(id=task_id)
-    return render(request, 'app/task_detail.html', {'task': task})
+    task = get_object_or_404(Task, id=task_id)
+    comments = task.comments.all()
+    attachments = task.attachments.all()
+    return render(request, 'app/task_detail.html', {
+        'task': task,
+        'comments': comments,
+        'attachments': attachments
+    })
 
 def task_update(request, task_id):
     task = Task.objects.get(id=task_id)
@@ -82,7 +111,7 @@ def task_update(request, task_id):
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
-            return redirect('task_detail', task_id=task.id)  # Redirect to the task's detail view
+            return redirect('app:task_detail', task_id=task.id)  # Redirect to the task's detail view
     else:
         form = TaskForm(instance=task)
     return render(request, 'app/task_form.html', {'form': form})
@@ -91,14 +120,14 @@ def task_update(request, task_id):
 def task_delete(request, task_id):
     task = Task.objects.get(id=task_id)
     task.delete()
-    return redirect('task_list')
+    return redirect('app:task_list')
 
 def comment_list(request, task_id):
     comments = Comment.objects.filter(task_id=task_id)
     return render(request, 'app/comment_list.html', {'comments': comments, 'task_id': task_id})
 
 def comment_create(request, task_id):
-    task = Task.objects.get(id=task_id)  # Get the Task instance
+    task = Task.objects.get(id=task_id)
 
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -107,11 +136,18 @@ def comment_create(request, task_id):
             comment.task = task  # Set the task instance
             comment.author = request.user  # Set the author to the current user
             comment.save()
-            return redirect('comment_list', task_id=task_id)
+            return redirect('app:comment_list', task_id=task_id)
     else:
         form = CommentForm()
 
     return render(request, 'app/comment_form.html', {'form': form, 'task_id': task_id})
+
+
+def comment_detail(request, task_id, comment_id):
+    task = get_object_or_404(Task, pk=task_id)
+    comment = get_object_or_404(Comment, pk=comment_id, task=task)
+    return render(request, 'app/comment_detail.html', {'task': task, 'comment': comment})
+
 
 def comment_update(request, comment_id):
     comment = Comment.objects.get(id=comment_id)
@@ -119,7 +155,7 @@ def comment_update(request, comment_id):
         form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
             form.save()
-            return redirect('comment_list', task_id=comment.task_id)
+            return redirect('app:comment_list', task_id=comment.task_id)
     else:
         form = CommentForm(instance=comment)
     return render(request, 'app/comment_form.html', {'form': form, 'comment_id': comment_id})
@@ -128,7 +164,7 @@ def comment_delete(request, comment_id):
     comment = Comment.objects.get(id=comment_id)
     task_id = comment.task_id
     comment.delete()
-    return redirect('comment_list', task_id=task_id)
+    return redirect('app:comment_list', task_id=task_id)
 
 def attachment_list(request, task_id):
     attachments = Attachment.objects.filter(task_id=task_id)
@@ -145,7 +181,7 @@ def attachment_create(request, task_id):
             attachment.task = task
             attachment.author = request.user
             attachment.save()
-            return redirect('task_detail', task_id=task.id)
+            return redirect('app:task_detail', task_id=task.id)
     else:
         form = AttachmentForm()
 
@@ -158,7 +194,7 @@ def attachment_update(request, attachment_id):
         form = AttachmentForm(request.POST, request.FILES, instance=attachment)
         if form.is_valid():
             form.save()
-            return redirect('attachment_list', task_id=attachment.task_id)
+            return redirect('app:attachment_list', task_id=attachment.task_id)
     else:
         form = AttachmentForm(instance=attachment)
     return render(request, 'app/attachment_form.html', {'form': form, 'attachment_id': attachment_id})
@@ -167,38 +203,5 @@ def attachment_delete(request, attachment_id):
     attachment = Attachment.objects.get(id=attachment_id)
     task_id = attachment.task_id
     attachment.delete()
-    return redirect('attachment_list', task_id=task_id)
+    return redirect('app:attachment_list', task_id=task_id)
 
-def label_list(request):
-    labels = Label.objects.all()
-    return render(request, 'app/label_list.html', {'labels': labels})
-
-"""
-def label_create(request):
-    if request.method == 'POST':
-        form = LabelForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('label_list')
-    else:
-        form = LabelForm()
-    return render(request, 'app/label_form.html', {'form': form})
-
-def label_update(request, label_id):
-    label = Label.objects.get(id=label_id)
-    if request.method == 'POST':
-        form = LabelForm(request.POST, instance=label)
-        if form.is_valid():
-            form.save()
-            return redirect('label_list')
-    else:
-        form = LabelForm(instance=label)
-    return render(request, 'app/label_form.html', {'form': form, 'label_id': label_id})
-def label_detail(request, label_id):
-    label = Label.objects.get(id=label_id)
-    return render(request, 'app/label_detail.html', {'label': label})
-def label_delete(request, label_id):
-    label = Label.objects.get(id=label_id)
-    label.delete()
-    return redirect('label_list')
-"""

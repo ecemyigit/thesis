@@ -9,11 +9,10 @@
     <ul>
         {% for task in tasks %}
             <li>
-                <a href="{% url 'task_detail' task.id %}">{{ task.title }}</a>
-                <!-- Add more details or links as needed -->
+                <a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a>
             </li>
         {% endfor %}
     </ul>
-    <a href="{% url 'task_create' %}">Create New Task</a>
+    <a href="{% url 'app:task_create' %}">Create New Task</a>
 </body>
 </html>

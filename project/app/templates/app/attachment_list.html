@@ -9,13 +9,14 @@
     <ul>
         {% for attachment in attachments %}
             <li>
-                {{ attachment.file_name }}
-                <!-- Add more attachment details or actions as needed -->
+                <a href="{{ attachment.content.url }}" target="_blank">{{ attachment.file_name }}</a>
+                <a href="{% url 'app:attachment_update' attachment.id %}">Edit</a>
+                <a href="{% url 'app:attachment_delete' attachment.id %}">Delete</a>
             </li>
         {% empty %}
             <li>No attachments yet.</li>
         {% endfor %}
     </ul>
-    <a href="{% url 'attachment_create' task_id %}">Add Attachment</a>
+    <a href="{% url 'app:attachment_create' task_id %}">Add Attachment</a>
 </body>
 </html>

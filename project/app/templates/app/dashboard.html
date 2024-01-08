@@ -6,18 +6,23 @@
 </head>
 <body>
     <h2>Dashboard</h2>
+
+    <!-- Logout Button -->
+    <form action="{% url 'app:logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+
     <div>
         <h3>Your Tasks</h3>
         {% for task in tasks %}
-            <p>{{ task.title }}</p>
-            <!-- Add more task details as needed -->
+            <p><a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a></p>
         {% endfor %}
     </div>
     <div>
         <h3>Your Teams</h3>
         {% for team in teams %}
-            <p>{{ team.name }}</p>
-            <!-- Add more team details as needed -->
+            <p><a href="{% url 'app:team_detail' team.id %}">{{ team.name }}</a></p>
         {% endfor %}
     </div>
 </body>

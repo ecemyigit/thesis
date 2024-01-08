@@ -7,11 +7,24 @@
 <body>
     <h2>{{ task.title }}</h2>
     <p>{{ task.description }}</p>
-    <!-- Add more task details as needed -->
     <p>Status: {{ task.status }}</p>
     <p>Due Date: {{ task.due_date }}</p>
-    <!-- Other fields like priority, assignee, etc. -->
-    <a href="{% url 'task_update' task.id %}">Edit Task</a>
-    <a href="{% url 'task_delete' task.id %}">Delete Task</a>
+
+    <a href="{% url 'app:task_update' task.id %}" class="btn btn-primary">Edit Task</a>
+    <a href="{% url 'app:task_delete' task.id %}" class="btn btn-danger">Delete Task</a>
+
+    <h3>Comments</h3>
+    <ul>
+        {% for comment in task.comments.all %}
+            <li>
+                <a href="{% url 'app:comment_detail' task.id comment.id %}">{{ comment.content }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'app:comment_create' task.id %}" class="btn btn-success">Add Comment</a>
+
+    <h3>Attachments</h3>
+    {% include 'app/attachment_list.html' with task_id=task.id %}
+
 </body>
 </html>

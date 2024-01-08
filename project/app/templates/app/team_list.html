@@ -9,11 +9,10 @@
     <ul>
         {% for team in teams %}
             <li>
-                <a href="{% url 'team_detail' team.id %}">{{ team.name }}</a>
-                <!-- Add more details or links as needed -->
+                <a href="{% url 'app:team_detail' team.id %}">{{ team.name }}</a>
             </li>
         {% endfor %}
     </ul>
-    <a href="{% url 'team_create' %}">Create New Team</a>
+    <a href="{% url 'app:team_create' %}">Create New Team</a>
 </body>
 </html>
