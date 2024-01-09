@@ -23,9 +23,8 @@
     <ul>
         {% for comment in task.comments.all %}
         <li>
-            <!-- Make sure 'comment_detail' URL is correct and 'comment' has the necessary fields -->
             <a href="{% url 'app:comment_detail' task.id comment.id %}">
-                {{ comment.content }} <!-- This should display the comment content -->
+                {{ comment.content }}
             </a>
         </li>
         {% empty %}

@@ -78,14 +78,12 @@ li {
     margin-top: 20px;
 }
 
-/* better alignment */
 .task-actions {
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
     .task-container {
         width: 90%;
