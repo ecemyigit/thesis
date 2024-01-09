@@ -1,18 +1,22 @@
-<!-- app/templates/app/task_list.html -->
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Task List</title>
+    <link rel="stylesheet" href="{% static 'css/task_list.css' %}">
 </head>
 <body>
-    <h2>Tasks</h2>
-    <ul>
-        {% for task in tasks %}
-            <li>
-                <a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'app:task_create' %}">Create New Task</a>
+    <div class="task-list-container">
+        <h2>Tasks</h2>
+        <ul class="task-list">
+            {% for task in tasks %}
+                <li>
+                    <a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'app:task_create' %}" class="btn btn-primary">Create New Task</a>
+    </div>
 </body>
 </html>

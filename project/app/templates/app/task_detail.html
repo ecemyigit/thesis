@@ -1,30 +1,45 @@
-<!-- app/templates/app/task_detail.html -->
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Task Detail</title>
+    <link rel="stylesheet" href="{% static 'css/task_detail.css' %}">
 </head>
 <body>
-    <h2>{{ task.title }}</h2>
-    <p>{{ task.description }}</p>
-    <p>Status: {{ task.status }}</p>
-    <p>Due Date: {{ task.due_date }}</p>
-
-    <a href="{% url 'app:task_update' task.id %}" class="btn btn-primary">Edit Task</a>
-    <a href="{% url 'app:task_delete' task.id %}" class="btn btn-danger">Delete Task</a>
-
+    <div class="task-container">
+        <h2>{{ task.title }}</h2>
+        <div class="task-details">
+            <p>{{ task.description }}</p>
+            <p>Status: {{ task.get_status_display }}</p>
+            <p>Due Date: {{ task.due_date }}</p>
+        </div>
+        <div class="task-actions">
+            <a href="{% url 'app:task_update' task.id %}" class="btn btn-primary">Edit Task</a>
+            <a href="{% url 'app:task_delete' task.id %}" class="btn btn-danger">Delete Task</a>
+        </div>
+       <div class="comments-section">
     <h3>Comments</h3>
     <ul>
         {% for comment in task.comments.all %}
-            <li>
-                <a href="{% url 'app:comment_detail' task.id comment.id %}">{{ comment.content }}</a>
-            </li>
+        <li>
+            <!-- Make sure 'comment_detail' URL is correct and 'comment' has the necessary fields -->
+            <a href="{% url 'app:comment_detail' task.id comment.id %}">
+                {{ comment.content }} <!-- This should display the comment content -->
+            </a>
+        </li>
+        {% empty %}
+        <li>No comments yet.</li>
         {% endfor %}
     </ul>
     <a href="{% url 'app:comment_create' task.id %}" class="btn btn-success">Add Comment</a>
-
-    <h3>Attachments</h3>
-    {% include 'app/attachment_list.html' with task_id=task.id %}
-
+</div>
+        <div class="attachments-section">
+            <h3>Attachments</h3>
+            {% include 'app/attachment_list.html' with task_id=task.id %}
+        </div>
+        <a href="{% url 'app:attachment_create' task.id %}" class="btn btn-info">Add Attachment</a>
+    </div>
 </body>
+
 </html>

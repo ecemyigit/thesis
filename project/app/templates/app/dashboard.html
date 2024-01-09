@@ -1,29 +1,38 @@
-<!-- app/templates/app/dashboard.html -->
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 </head>
 <body>
-    <h2>Dashboard</h2>
+    <header class="header">
+        <h1>Dashboard</h1>
+        <form action="{% url 'app:logout' %}" method="post" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-logout">Logout</button>
+        </form>
+    </header>
 
-    <!-- Logout Button -->
-    <form action="{% url 'app:logout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
-
-    <div>
-        <h3>Your Tasks</h3>
-        {% for task in tasks %}
-            <p><a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a></p>
-        {% endfor %}
-    </div>
-    <div>
-        <h3>Your Teams</h3>
-        {% for team in teams %}
-            <p><a href="{% url 'app:team_detail' team.id %}">{{ team.name }}</a></p>
-        {% endfor %}
-    </div>
+    <main class="main-content">
+        <section class="tasks">
+            <h2>Your Tasks</h2>
+            <ul>
+                {% for task in tasks %}
+                    <li><a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </section>
+        <section class="teams">
+            <h2>Your Teams</h2>
+            <ul>
+                {% for team in teams %}
+                    <li><a href="{% url 'app:team_detail' team.id %}">{{ team.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </section>
+    </main>
 </body>
 </html>
+
