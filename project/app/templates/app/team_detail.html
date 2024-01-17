@@ -1,20 +1,25 @@
-<!-- app/templates/app/team_detail.html -->
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Team Detail</title>
+    <link rel="stylesheet" href="{% static 'css/team_detail.css' %}">
 </head>
 <body>
-    <h2>{{ team.name }}</h2>
-    <p>{{ team.description }}</p>
-    <h3>Members</h3>
-    <ul>
-        {% for member in members %}
-    <li>{{ member.get_full_name|default:member.username }}</li>
-        {% endfor %}
-    </ul>
-    <!-- Add more team details as needed -->
-    <a href="{% url 'app:team_update' team.id %}">Edit Team</a>
-    <a href="{% url 'app:team_delete' team.id %}">Delete Team</a>
+    <div class="container">
+        <h2>{{ team.name }}</h2>
+        <p>{{ team.description }}</p>
+        <h3>Members</h3>
+        <ul class="member-list">
+            {% for member in members %}
+            <li>{{ member.get_full_name|default:member.username }}</li>
+            {% endfor %}
+        </ul>
+        <div class="team-actions">
+            <a href="{% url 'app:team_update' team.id %}" class="btn btn-primary">Edit Team</a>
+            <a href="{% url 'app:team_delete' team.id %}" class="btn btn-danger">Delete Team</a>
+        </div>
+    </div>
 </body>
 </html>

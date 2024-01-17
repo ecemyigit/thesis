@@ -1,15 +1,19 @@
-<!-- app/templates/app/team_form.html -->
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Create/Edit Team</title>
+    <link rel="stylesheet" href="{% static 'css/team_form.css' %}">
 </head>
 <body>
-    <h2>Create/Edit Team</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save Team</button>
-    </form>
+    <div class="form-container">
+        <h2>{{ form_title }}</h2>
+        <form method="post" class="team-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Save Team</button>
+        </form>
+    </div>
 </body>
 </html>

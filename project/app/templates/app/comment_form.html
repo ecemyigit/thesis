@@ -1,12 +1,14 @@
-<!-- app/templates/app/comment_form.html -->
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Add/Edit Comment</title>
+            <link rel="stylesheet" href="{% static 'css/comment_form.css' %}">
+
 </head>
 <body>
     <h2>Add/Edit Comment</h2>
-    <form method="post">
+<form method="post" action="">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Save Comment</button>

@@ -1,4 +1,3 @@
-/* login */
 body, html {
   height: 100%;
   margin: 0;
@@ -8,7 +7,7 @@ body, html {
   background-color: #f0f0f0;
 }
 
-.login-container, .register-container {
+.login-container {
   background-color: #fff;
   padding: 20px;
   border-radius: 5px;
@@ -20,14 +19,14 @@ form {
   flex-direction: column;
 }
 
-input, .register-container input[type="email"] {
+input {
   margin-bottom: 10px;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
 }
 
-button, .btn-register {
+button {
   padding: 10px 15px;
   background-color: #007bff;
   color: white;
@@ -36,6 +35,6 @@ button, .btn-register {
   cursor: pointer;
 }
 
-button:hover, .btn-register:hover {
+button:hover {
   background-color: #0056b3;
 }

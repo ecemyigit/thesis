@@ -1,4 +1,5 @@
-<!-- app/templates/app/attachment_list.html -->
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,6 +17,5 @@
             <li>No attachments yet.</li>
         {% endfor %}
     </ul>
-    <a href="{% url 'app:attachment_create' task_id %}">Add Attachment</a>
 </body>
 </html>

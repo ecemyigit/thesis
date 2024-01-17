@@ -136,7 +136,7 @@ def comment_create(request, task_id):
             comment.task = task  # Set the task instance
             comment.author = request.user  # Set the author to the current user
             comment.save()
-            return redirect('app:comment_list', task_id=task_id)
+            return redirect('app:task_detail', task_id=task_id)
     else:
         form = CommentForm()
 
@@ -198,6 +198,7 @@ def attachment_update(request, attachment_id):
     else:
         form = AttachmentForm(instance=attachment)
     return render(request, 'app/attachment_form.html', {'form': form, 'attachment_id': attachment_id})
+
 
 def attachment_delete(request, attachment_id):
     attachment = Attachment.objects.get(id=attachment_id)
