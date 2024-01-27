@@ -41,4 +41,8 @@ urlpatterns = [
     path('tasks/<int:task_id>/attachments/create/', views.attachment_create, name='attachment_create'),
     path('attachments/<int:attachment_id>/update/', views.attachment_update, name='attachment_update'),
     path('attachments/<int:attachment_id>/delete/', views.attachment_delete, name='attachment_delete'),
+
+    path('get_task_events/', views.get_task_events, name='get_task_events'),
+    path('get_kanban_tasks/', views.get_kanban_tasks, name='get_kanban_tasks'),
+
 ]

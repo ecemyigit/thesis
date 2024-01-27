@@ -1,12 +1,20 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js'></script>
 </head>
 <body>
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a href="{% url 'app:task_list' %}">Tasks</a>
+        <a href="{% url 'app:team_list' %}">Teams</a>
+    </div>
     <header class="header">
         <h1>Dashboard</h1>
         <form action="{% url 'app:logout' %}" method="post" class="logout-form">
@@ -16,23 +24,179 @@
     </header>
 
     <main class="main-content">
-        <section class="tasks">
-            <h2>Your Tasks</h2>
-            <ul>
-                {% for task in tasks %}
-                    <li><a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a></li>
-                {% endfor %}
-            </ul>
+        <section class="kanban-board">
+            <section class="kanban-column" id="to-do-column">
+                <div class="task-list" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <!-- Tasks in the 'To Do' column -->
+                </div>
+            </section>
+            <section class="kanban-column" id="in-progress-column">
+                <div class="task-list" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <!-- Tasks in the 'In Progress' column -->
+                </div>
+            </section>
+            <section class="kanban-column" id="done-column">
+                <div class="task-list" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <!-- Tasks in the 'Done' column -->
+                </div>
+            </section>
         </section>
-        <section class="teams">
-            <h2>Your Teams</h2>
-            <ul>
-                {% for team in teams %}
-                    <li><a href="{% url 'app:team_detail' team.id %}">{{ team.name }}</a></li>
-                {% endfor %}
-            </ul>
-        </section>
+
+        <div id="calendar"></div>
     </main>
+    <script>
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrfToken = getCookie("csrftoken");
+        console.log('CSRF Token:', csrfToken);
+
+        console.log('Script loaded');
+
+        // Function to allow dropping items
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        // Function to handle the drag event
+        function drag(event) {
+            event.dataTransfer.setData('text', event.target.id);
+        }
+
+        // Function to handle the drop event
+       function drop(event) {
+    event.preventDefault();
+    const taskId = event.dataTransfer.getData("text/plain");
+    const targetColumn = event.target.closest(".kanban-column");
+    const status = getStatusFromColumnId(targetColumn.id);
+
+    console.log(`Task ID: ${taskId}, Target Status: ${status}`);
+
+    if (taskId && status) {
+
+        fetch(`/app/tasks/${taskId}/update/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ status: status }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Task status updated successfully on backend:', data);
+
+            // Attempt to move the task element
+            const taskElement = document.getElementById(taskId);
+            console.log(`Moving task element:`, taskElement);
+
+            if (taskElement && targetColumn) {
+                const taskList = targetColumn.querySelector('.task-list');
+                console.log(`Appending to new column:`, taskList);
+                taskList.appendChild(taskElement);
+            }
+        })
+        .catch(error => {
+            console.error('Failed to update task status:', error);
+        });
+    }
+}
+
+
+        // Function to get background color based on status
+        function getStatusBackgroundColor(status) {
+            switch (status) {
+                case 'TODO':
+                    return 'red'; // Set the background color for 'To Do' tasks
+                case 'IN_PROGRESS':
+                    return 'yellow'; // Set the background color for 'In Progress' tasks
+                case 'DONE':
+                    return 'green'; // Set the background color for 'Done' tasks
+                default:
+                    return 'white'; // Set a default background color for other statuses
+            }
+        }
+// Function to convert columnId to TaskStatus value
+function getStatusFromColumnId(columnId) {
+    switch (columnId) {
+        case 'to-do-column':
+            return 'To Do'; // Adjusted to match the TaskStatus value
+        case 'in-progress-column':
+            return 'In Progress'; // Adjusted to match the TaskStatus value
+        case 'done-column':
+            return 'Done'; // Adjusted to match the TaskStatus value
+        default:
+            return null;
+    }
+}
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: '{% url 'app:get_task_events' %}',
+                eventClick: function(info) {
+                    window.location.href = '{% url 'app:task_detail' 0 %}'.replace('0', info.event.id);
+                }
+            });
+            calendar.render();
+
+            function loadTasks() {
+                fetch('{% url 'app:get_kanban_tasks' %}')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Fetched Kanban Data:', data); // Log the retrieved data
+                        populateColumn('to-do-column', data.todo);
+                        populateColumn('in-progress-column', data.in_progress);
+                        populateColumn('done-column', data.done);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Kanban Data:', error);
+                    });
+            }
+
+            function populateColumn(columnId, tasks) {
+                console.log('Populating column:', columnId);
+                var column = document.getElementById(columnId);
+                console.log('Column element:', column);
+                var taskList = column.querySelector('.task-list');
+                console.log('Task list element:', taskList);
+
+                taskList.innerHTML = '';
+
+                tasks.forEach(task => {
+                    var taskElement = document.createElement('div');
+                    taskElement.textContent = task.title;
+                    taskElement.id = task.id;
+                    taskElement.draggable = true;
+                    taskElement.addEventListener('dragstart', drag);
+                    taskList.appendChild(taskElement);
+                });
+            }
+
+            // Load tasks when the page loads.
+            loadTasks();
+        });
+    </script>
 </body>
 </html>
-

@@ -61,3 +61,39 @@ li a {
 .btn:hover {
     opacity: 0.8;
 }
+
+/* Kanban Columns */
+.kanban-column {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    display: inline-block;
+    vertical-align: top;
+    min-width: 200px;
+}
+
+.kanban-column h3 {
+    margin-top: 0;
+}
+
+/* Task Styling */
+.task-list {
+    min-height: 100px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.task-list div {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
