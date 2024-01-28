@@ -8,16 +8,16 @@
 <body>
     <h2>Comments</h2>
     <ul>
-        {% for comment in comments %}
-            <li>
-                <a href="{% url 'app:comment_detail' task_id=task_id comment_id=comment.id %}">{{ comment.content }}</a> - by {{ comment.author.username }}
-                <a href="{% url 'app:comment_update' comment.id %}">Edit</a>
-                <a href="{% url 'app:comment_delete' comment.id %}">Delete</a>
-            </li>
+       {% for comment in comments %}
+    <li>
+        <a href="{% url 'app:comment_detail' task_id=task_id comment_id=comment.id %}">{{ comment.content }}</a> - by {{ comment.author.username }}
+        <a href="{% url 'app:comment_update' comment.id %}">Edit</a>
+        <a href="{% url 'app:comment_delete' comment.id %}">Delete</a>
+    </li>
+{% empty %}
+    <li>No comments yet.</li>
+{% endfor %}
 
-        {% empty %}
-            <li>No comments yet.</li>
-        {% endfor %}
     </ul>
     <a href="{% url 'app:comment_create' task_id %}">Add Comment</a>
 </body>

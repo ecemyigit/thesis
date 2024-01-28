@@ -17,7 +17,7 @@
     </div>
     <header class="header">
         <h1>Dashboard</h1>
-        <form action="{% url 'app:logout' %}" method="post" class="logout-form">
+        <form action="{% url 'app:logout' %}" method="POST" class="logout-form">
             {% csrf_token %}
             <button type="submit" class="btn btn-logout">Logout</button>
         </form>
@@ -77,24 +77,24 @@
         }
 
         // Function to handle the drop event
-       function drop(event) {
+      function drop(event) {
     event.preventDefault();
     const taskId = event.dataTransfer.getData("text/plain");
     const targetColumn = event.target.closest(".kanban-column");
     const status = getStatusFromColumnId(targetColumn.id);
 
     console.log(`Task ID: ${taskId}, Target Status: ${status}`);
+const dataToSend = JSON.stringify({ status: status });
+console.log("Sending:", dataToSend);
 
-    if (taskId && status) {
-
-        fetch(`/app/tasks/${taskId}/update/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-            },
-            body: JSON.stringify({ status: status }),
-        })
+fetch(`/app/tasks/${taskId}/update/`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+    },
+    body: dataToSend
+})
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok.');
@@ -104,21 +104,24 @@
         .then(data => {
             console.log('Task status updated successfully on backend:', data);
 
-            // Attempt to move the task element
+            // Retrieve and move the task element
             const taskElement = document.getElementById(taskId);
-            console.log(`Moving task element:`, taskElement);
+            console.log(`Task Element:`, taskElement);
 
             if (taskElement && targetColumn) {
                 const taskList = targetColumn.querySelector('.task-list');
                 console.log(`Appending to new column:`, taskList);
                 taskList.appendChild(taskElement);
+            } else {
+                console.error('Task element or target column not found');
             }
         })
         .catch(error => {
             console.error('Failed to update task status:', error);
         });
     }
-}
+
+
 
 
         // Function to get background color based on status
@@ -138,15 +141,20 @@
 function getStatusFromColumnId(columnId) {
     switch (columnId) {
         case 'to-do-column':
+            console.log('Column ID: to-do-column, Status: To Do');
             return 'To Do'; // Adjusted to match the TaskStatus value
         case 'in-progress-column':
+            console.log('Column ID: in-progress-column, Status: In Progress');
             return 'In Progress'; // Adjusted to match the TaskStatus value
         case 'done-column':
+            console.log('Column ID: done-column, Status: Done');
             return 'Done'; // Adjusted to match the TaskStatus value
         default:
+            console.log('Column ID: Unknown, Status: null');
             return null;
     }
 }
+
 
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded');

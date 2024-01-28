@@ -18,21 +18,22 @@
             <a href="{% url 'app:task_update' task.id %}" class="btn btn-primary">Edit Task</a>
             <a href="{% url 'app:task_delete' task.id %}" class="btn btn-danger">Delete Task</a>
         </div>
-        <div class="comments-section">
-            <h3>Comments</h3>
-            <ul>
-                {% for comment in task.comments.all %}
-                <li>
-                    <a href="{% url 'app:comment_detail' task.id comment.id %}">
-                        {{ comment.content }}
-                    </a>
-                </li>
-                {% empty %}
-                <li>No comments yet.</li>
-                {% endfor %}
-            </ul>
-            <a href="{% url 'app:comment_create' task.id %}" class="btn btn-success">Add Comment</a>
-        </div>
+       <div class="comments-section">
+    <h3>Comments</h3>
+    <ul>
+        {% for comment in task.comments.all %}
+        <li>
+            <a href="{% url 'app:comment_detail' task.id comment.id %}">
+                {{ comment.content }} - <strong>{{ comment.author.username }}</strong> on {{ comment.date }}
+            </a>
+        </li>
+        {% empty %}
+        <li>No comments yet.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'app:comment_create' task.id %}" class="btn btn-success">Add Comment</a>
+</div>
+
         <div class="attachments-section">
             <h3>Attachments</h3>
             {% include 'app/attachment_list.html' with task_id=task.id attachments=task.attachments.all %}

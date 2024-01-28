@@ -9,10 +9,18 @@
 <body>
     <div class="task-list-container">
         <h2>Tasks</h2>
+
+        <!-- Sorting Control -->
+        <div class="sorting-control">
+            <a href="{% url 'app:task_list' %}?sort=priority">Sort by Priority</a>
+        </div>
+
         <ul class="task-list">
             {% for task in tasks %}
                 <li>
                     <a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a>
+                    <!-- Displaying priority -->
+                    <span class="task-priority">Priority: {{ task.priority }}</span>
                 </li>
             {% endfor %}
         </ul>

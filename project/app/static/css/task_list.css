@@ -19,6 +19,26 @@ h2 {
     text-align: center;
 }
 
+.sorting-control {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sorting-control a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    background-color: #e7f2f8;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sorting-control a:hover {
+    background-color: #0056b3;
+    color: #fff;
+}
+
 .task-list {
     list-style-type: none;
     padding: 0;
@@ -30,6 +50,7 @@ h2 {
     padding: 10px;
     border-radius: 4px;
     text-align: center;
+    position: relative;
 }
 
 .task-list li a {
@@ -38,32 +59,41 @@ h2 {
     display: block;
 }
 
+.task-list .task-priority {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #555;
+}
+
 .btn {
     display: block;
-    width:-content;
-margin: 20px auto;
-background-color: #007bff;
-color: #fff;
-padding: 10px 15px;
-border-radius: 5px;
-text-align: center;
-text-decoration: none;
-transition: background-color 0.3s;
+    width: fit-content;
+    margin: 20px auto;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s;
 }
 
 .btn:hover {
-background-color: #0056b3;
+    background-color: #0056b3;
 }
 
 .btn-primary {
-background-color: #4CAF50;
-border: none;
-padding: 10px 20px;
-text-align: center;
-text-decoration: none;
-display: inline-block;
-font-size: 16px;
-margin: 4px 2px;
-cursor: pointer;
-border-radius: 12px;
+    background-color: #4CAF50;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
 }

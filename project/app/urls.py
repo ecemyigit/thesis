@@ -5,7 +5,6 @@ from django.contrib.auth import views as auth_views
 from . import views
 from .views import logout
 
-
 app_name = 'app'
 
 urlpatterns = [
