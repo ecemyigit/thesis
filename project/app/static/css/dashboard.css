@@ -54,7 +54,7 @@ li a {
     font-size: 16px;
 }
 
-.btn-logout {
+.btn.btn-logout {
     background-color: #dc3545;
 }
 
@@ -96,4 +96,3 @@ li a {
     border-radius: 5px;
     cursor: pointer;
 }
-

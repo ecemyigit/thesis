@@ -18,7 +18,11 @@
         </ul>
         <div class="team-actions">
             <a href="{% url 'app:team_update' team.id %}" class="btn btn-primary">Edit Team</a>
-            <a href="{% url 'app:team_delete' team.id %}" class="btn btn-danger">Delete Team</a>
+
+            <form action="{% url 'app:team_delete' team.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Delete Team</button>
+            </form>
         </div>
     </div>
 </body>

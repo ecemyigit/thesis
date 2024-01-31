@@ -1,16 +1,27 @@
 
 from .forms import UserRegisterForm, TaskForm, TeamForm, CommentForm, AttachmentForm
 from .models import Team, Comment, Attachment
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import auth
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from django.shortcuts import redirect
 from .models import Task, TaskStatus
+from django.contrib import messages
 import json
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponseNotAllowed
+from django.contrib.auth.models import User, Group
+
+def is_team_leader(user):
+    team_leader_group = 'Team Leader'
+    is_leader = user.groups.filter(name=team_leader_group).exists()
+    print(f"{user.username} is a team leader: {is_leader}")
+    return is_leader
+
+def is_team_member(user):
+    team_member_group = 'Team Member'
+    is_member = user.groups.filter(name=team_member_group).exists()
+    print(f"{user.username} is a team member: {is_member}")
+    return is_member
 
 def get_task_events(request):
     task_events = []
@@ -72,12 +83,15 @@ def logout(request):
     auth.logout(request)
     return redirect('app:login')
 
-
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+
+            team_member_group = Group.objects.get(name='Team Member')
+            user.groups.add(team_member_group)
+
             return redirect('app:login')
     else:
         form = UserRegisterForm()
@@ -95,17 +109,28 @@ def team_list(request):
     teams = Team.objects.all()
     return render(request, 'app/team_list.html', {'teams': teams})
 
-
+@login_required
 def team_create(request):
-    if request.method == 'POST':
-        form = TeamForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('app:team_list')
-    else:
-        form = TeamForm()
-    return render(request, 'app/team_form.html', {'form': form})
+    # Check if the user is a team leader
+    if request.user.groups.filter(name='Team Leader').exists():
+        if request.method == 'POST':
+            form = TeamForm(request.POST)
+            if form.is_valid():
+                team = form.save(commit=False)
+                team.team_leader = request.user
+                team.save()
+                messages.success(request, 'Team created successfully!')
+                return redirect('app:team_detail', team_id=team.id)
+            else:
+                messages.error(request, 'Error creating the team. Please check the form data.')
 
+        else:
+            form = TeamForm()
+
+        return render(request, 'app/team_form.html', {'form': form})
+    else:
+        # User is not authorized, return a custom error message or redirect
+        return HttpResponseForbidden("You are not authorized to access this page.")
 
 def team_detail(request, team_id):
     team = get_object_or_404(Team, pk=team_id)
@@ -113,22 +138,48 @@ def team_detail(request, team_id):
     return render(request, 'app/team_detail.html', {'team': team, 'members': members})
 
 
+@login_required
 def team_update(request, team_id):
-    team = Team.objects.get(id=team_id)
-    if request.method == 'POST':
-        form = TeamForm(request.POST, instance=team)
-        if form.is_valid():
-            form.save()
-            return redirect('app:team_detail', team_id=team.id)
+    team = get_object_or_404(Team, pk=team_id)
+
+    # Check if the user is the team leader or has the necessary permissions
+    if request.user == team.team_leader or request.user.groups.filter(name='Team Leader').exists():
+        # User has permission, allow them to access the view
+        if request.method == 'POST':
+            form = TeamForm(request.POST, instance=team)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Team updated successfully!')
+                return redirect('app:team_detail', team_id=team.id)
+            else:
+                messages.error(request, 'Error updating the team. Please check the form data.')
+        else:
+            form = TeamForm(instance=team)
+
+        return render(request, 'app/team_form.html', {'form': form, 'team': team})
+
     else:
-        form = TeamForm(instance=team)
-    return render(request, 'app/team_form.html', {'form': form})
+        # User is not authorized, return a custom error message or redirect
+        return HttpResponseForbidden("You are not authorized to access this page.")
 
 
+@login_required
 def team_delete(request, team_id):
-    team = Team.objects.get(id=team_id)
-    team.delete()
-    return redirect('app:team_list')
+    team = get_object_or_404(Team, pk=team_id)
+
+    # Check if the user is the team leader
+    if request.user == team.team_leader:
+        if request.method == 'POST':
+            team.delete()
+            messages.success(request, 'Team deleted successfully!')
+            return redirect('app:team_list')
+        else:
+            messages.error(request, 'Error deleting the team.')
+            return redirect('app:team_list')
+
+    else:
+        # User is not authorized, return a custom error message or redirect
+        return HttpResponseForbidden("You are not authorized to access this page.")
 
 
 @login_required
@@ -156,7 +207,6 @@ def task_create(request):
     return render(request, 'app/task_form.html', {'form': form})
 
 
-# views.py
 def task_detail(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     comments = task.comments.all()
@@ -167,29 +217,34 @@ def task_detail(request, task_id):
         'attachments': attachments
     })
 
-@csrf_exempt
-@require_POST
 def task_update(request, task_id):
-    try:
-        data = json.loads(request.body)
-        new_status = data.get('status')
+    task = get_object_or_404(Task, id=task_id)
 
-        if new_status not in [status[0] for status in TaskStatus.choices]:
-            return JsonResponse({'error': 'Invalid status value'}, status=400)
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            new_status = data.get('status')
 
-        task = Task.objects.get(id=task_id)
-        task.status = new_status
-        task.save()
-        return JsonResponse({'status': task.status})
+            if new_status not in [status[0] for status in TaskStatus.choices]:
+                return JsonResponse({'error': 'Invalid status value'}, status=400)
 
-    except Task.DoesNotExist:
-        return JsonResponse({'error': 'Task not found'}, status=404)
-    except json.JSONDecodeError:
-        print("Invalid JSON:", request.body)  # Log the invalid JSON data
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    except Exception as e:
-        print("Error:", str(e))
-        return JsonResponse({'error': 'An error occurred'}, status=500)
+            task.status = new_status
+            task.save()
+            return JsonResponse({'status': task.status})
+
+        except Task.DoesNotExist:
+            return JsonResponse({'error': 'Task not found'}, status=404)
+        except json.JSONDecodeError:
+            print("Invalid JSON:", request.body)
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            print("Error:", str(e))
+            return JsonResponse({'error': 'An error occurred'}, status=500)
+
+    elif request.method == 'GET':
+        return render(request, 'app/task_form.html', {'form': TaskForm(instance=task)})
+
+    return HttpResponseNotAllowed(['GET', 'POST'])
 def task_delete(request, task_id):
     task = Task.objects.get(id=task_id)
     task.delete()
@@ -209,7 +264,7 @@ def comment_create(request, task_id):
         if form.is_valid():
             comment = form.save(commit=False)
             comment.task = task
-            comment.author = request.user  
+            comment.author = request.user
             comment.save()
             return redirect('app:task_detail', task_id=task_id)
     else:

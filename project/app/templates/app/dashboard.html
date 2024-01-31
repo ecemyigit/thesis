@@ -5,7 +5,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js'></script>
 </head>
@@ -17,13 +16,28 @@
     </div>
     <header class="header">
         <h1>Dashboard</h1>
-        <form action="{% url 'app:logout' %}" method="POST" class="logout-form">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-logout">Logout</button>
-        </form>
+    <form action="{% url 'app:logout' %}" method="post" style="margin-left: auto;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-logout">Logout</button>
+    </form>
     </header>
 
     <main class="main-content">
+        <section class="tasks">
+            <h2>Your Tasks</h2>
+            <ul>
+                {% for task in tasks %}
+                    <li><a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </section>
+        <section class="teams">
+            <h2>Your Teams</h2>
+            <ul>
+                {% for team in teams %}
+                    <li><a href="{% url 'app:team_detail' team.id %}">{{ team.name }}</a></li>
+                {% endfor %}
+            </ul>
         <section class="kanban-board">
             <section class="kanban-column" id="to-do-column">
                 <div class="task-list" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -44,6 +58,7 @@
 
         <div id="calendar"></div>
     </main>
+</body>
     <script>
         function getCookie(name) {
             var cookieValue = null;
@@ -77,24 +92,25 @@
         }
 
         // Function to handle the drop event
-      function drop(event) {
+       function drop(event) {
+       event.stopPropagation(); // Add this line to stop event propagation
     event.preventDefault();
     const taskId = event.dataTransfer.getData("text/plain");
     const targetColumn = event.target.closest(".kanban-column");
     const status = getStatusFromColumnId(targetColumn.id);
 
     console.log(`Task ID: ${taskId}, Target Status: ${status}`);
-const dataToSend = JSON.stringify({ status: status });
-console.log("Sending:", dataToSend);
 
-fetch(`/app/tasks/${taskId}/update/`, {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-    },
-    body: dataToSend
-})
+    if (taskId && status) {
+
+        fetch(`/app/tasks/${taskId}/update/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ status: status }),
+        })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok.');
@@ -104,24 +120,21 @@ fetch(`/app/tasks/${taskId}/update/`, {
         .then(data => {
             console.log('Task status updated successfully on backend:', data);
 
-            // Retrieve and move the task element
+            // Attempt to move the task element
             const taskElement = document.getElementById(taskId);
-            console.log(`Task Element:`, taskElement);
+            console.log(`Moving task element:`, taskElement);
 
             if (taskElement && targetColumn) {
                 const taskList = targetColumn.querySelector('.task-list');
                 console.log(`Appending to new column:`, taskList);
                 taskList.appendChild(taskElement);
-            } else {
-                console.error('Task element or target column not found');
             }
         })
         .catch(error => {
             console.error('Failed to update task status:', error);
         });
     }
-
-
+}
 
 
         // Function to get background color based on status
@@ -206,5 +219,6 @@ function getStatusFromColumnId(columnId) {
             loadTasks();
         });
     </script>
+
 </body>
 </html>

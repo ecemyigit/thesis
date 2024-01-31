@@ -11,6 +11,7 @@ class Team(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     members = models.ManyToManyField(User, related_name='teams')
+    team_leader = models.ForeignKey(User, related_name='led_teams', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -35,7 +36,8 @@ class Task(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
+
+def __str__(self):
         return self.title
 
 class Comment(models.Model):
