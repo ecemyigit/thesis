@@ -217,11 +217,13 @@ def task_detail(request, task_id):
         'attachments': attachments
     })
 
+
 def task_update(request, task_id):
     task = get_object_or_404(Task, id=task_id)
 
     if request.method == 'POST':
-        try:
+        if request.content_type == 'application/json':
+            # Handle JSON data for drag-and-drop updates
             data = json.loads(request.body)
             new_status = data.get('status')
 
@@ -230,21 +232,42 @@ def task_update(request, task_id):
 
             task.status = new_status
             task.save()
+
+            # Return a JSON response
             return JsonResponse({'status': task.status})
 
-        except Task.DoesNotExist:
-            return JsonResponse({'error': 'Task not found'}, status=404)
-        except json.JSONDecodeError:
-            print("Invalid JSON:", request.body)
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-        except Exception as e:
-            print("Error:", str(e))
-            return JsonResponse({'error': 'An error occurred'}, status=500)
+        else:
+            # Parse form data from the request for form-based updates
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            priority = request.POST.get('priority')
+            due_date = request.POST.get('due_date')
+            status = request.POST.get('status')
+            team = request.POST.get('team')
+            assignee = request.POST.get('assignee')
+
+            task.title = title
+            task.description = description
+            task.priority = priority
+            task.due_date = due_date
+            task.status = status
+            task.team_id = team
+            task.assignee_id = assignee
+            task.save()
+
+            # Redirect to the task list page (app/tasks) after updating the task
+            return redirect('app:task_list')
 
     elif request.method == 'GET':
-        return render(request, 'app/task_form.html', {'form': TaskForm(instance=task)})
+        form = TaskForm(instance=task)
+        context = {
+            'form': form,
+            'form_title': 'Update Task',
+        }
+        return render(request, 'app/task_update_form.html', context)
 
-    return HttpResponseNotAllowed(['GET', 'POST'])
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 def task_delete(request, task_id):
     task = Task.objects.get(id=task_id)
     task.delete()

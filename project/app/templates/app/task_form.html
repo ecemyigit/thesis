@@ -10,10 +10,11 @@
     <div class="form-container">
         <h2>{% block header %}Create/Edit Task{% endblock %}</h2>
         <form method="post" class="task-form">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn">Save Task</button>
-        </form>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Save Task</button>
+</form>
+
     </div>
 </body>
 </html>

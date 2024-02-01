@@ -18,21 +18,32 @@
             <a href="{% url 'app:task_update' task.id %}" class="btn btn-primary">Edit Task</a>
             <a href="{% url 'app:task_delete' task.id %}" class="btn btn-danger">Delete Task</a>
         </div>
-       <div class="comments-section">
-    <h3>Comments</h3>
-    <ul>
-        {% for comment in task.comments.all %}
-        <li>
-            <a href="{% url 'app:comment_detail' task.id comment.id %}">
-                {{ comment.content }} - <strong>{{ comment.author.username }}</strong> on {{ comment.date }}
-            </a>
-        </li>
-        {% empty %}
-        <li>No comments yet.</li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'app:comment_create' task.id %}" class="btn btn-success">Add Comment</a>
-</div>
+
+        <!-- Edit Form -->
+        <div class="edit-form" style="display: none;">
+            <h3>Edit Task</h3>
+            <form method="post" action="{% url 'app:task_update' task.id %}">
+                {% csrf_token %}
+                {{ task_form.as_p }}
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+
+        <div class="comments-section">
+            <h3>Comments</h3>
+            <ul>
+                {% for comment in task.comments.all %}
+                <li>
+                    <a href="{% url 'app:comment_detail' task.id comment.id %}">
+                        {{ comment.content }} - <strong>{{ comment.author.username }}</strong> on {{ comment.date }}
+                    </a>
+                </li>
+                {% empty %}
+                <li>No comments yet.</li>
+                {% endfor %}
+            </ul>
+            <a href="{% url 'app:comment_create' task.id %}" class="btn btn-success">Add Comment</a>
+        </div>
 
         <div class="attachments-section">
             <h3>Attachments</h3>
@@ -40,5 +51,15 @@
         </div>
         <a href="{% url 'app:attachment_create' task.id %}" class="btn btn-info">Add Attachment</a>
     </div>
+
+    <script>
+        const editButton = document.querySelector('#edit-task-button');
+        const editForm = document.querySelector('.edit-form');
+
+        editButton.addEventListener('click', () => {
+            editForm.style.display = 'block';
+            editButton.style.display = 'none';
+        });
+    </script>
 </body>
 </html>

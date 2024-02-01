@@ -21,6 +21,7 @@
                     <a href="{% url 'app:task_detail' task.id %}">{{ task.title }}</a>
                     <!-- Displaying priority -->
                     <span class="task-priority">Priority: {{ task.priority }}</span>
+                    <a href="{% url 'app:task_update' task.id %}" class="update-task-link">Update</a> <!-- Add this line -->
                 </li>
             {% endfor %}
         </ul>

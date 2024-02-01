@@ -23,6 +23,7 @@ class TaskForm(forms.ModelForm):
             'due_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
+
 class TeamForm(forms.ModelForm):
     class Meta:
         model = Team
